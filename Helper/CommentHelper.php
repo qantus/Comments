@@ -26,9 +26,9 @@ class CommentHelper
     public static function render_comments($template, HasManyManager $manager)
     {
         $pager = new Pagination($manager->getQuerySet());
-        $comments = $pager->paginate();
-        self::renderStatic($template, [
-            'data' => $comments,
+        return self::renderStatic($template, [
+            'comments' => $pager->paginate(),
+            'pager' => $pager
         ]);
     }
 }

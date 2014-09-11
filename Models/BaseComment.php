@@ -17,6 +17,7 @@ namespace Modules\Comments\Models;
 use Mindy\Base\Mindy;
 use Mindy\Orm\Fields\BooleanField;
 use Mindy\Orm\Fields\CharField;
+use Mindy\Orm\Fields\DateTimeField;
 use Mindy\Orm\Fields\EmailField;
 use Mindy\Orm\Fields\ForeignField;
 use Mindy\Orm\Fields\TextField;
@@ -28,7 +29,7 @@ abstract class BaseComment extends TreeModel
 {
     public static function getFields()
     {
-        return [
+        return array_merge(parent::getFields(), [
             'username' => [
                 'class' => CharField::className(),
                 'null' => true
@@ -53,7 +54,18 @@ abstract class BaseComment extends TreeModel
                 'class' => TextField::className(),
                 'null' => false
             ],
-        ];
+            'created_at' => [
+                'class' => DateTimeField::className(),
+                'autoNowAdd' => true
+            ],
+            'updated_at' => [
+                'class' => DateTimeField::className(),
+                'autoNow' => true
+            ],
+            'published_at' => [
+                'class' => DateTimeField::className()
+            ],
+        ]);
     }
 
     public function beforeSave($owner, $isNew)
@@ -82,6 +94,12 @@ abstract class BaseComment extends TreeModel
                 $owner->is_spam = $akismet->isCommentSpam();
                 $owner->is_published = !$owner->is_spam;
             }
+        }
+
+        if($owner->is_published) {
+            $owner->published_at = time();
+        } else {
+            $owner->published_at = null;
         }
     }
 
