@@ -1,9 +1,9 @@
 <?php
 /**
- * 
+ *
  *
  * All rights reserved.
- * 
+ *
  * @author Falaleev Maxim
  * @email max@studio107.ru
  * @version 1.0
@@ -14,19 +14,39 @@
 
 namespace Modules\Comments\Forms;
 
+use Mindy\Base\Mindy;
+use Mindy\Form\Fields\HiddenField;
 use Mindy\Form\ModelForm;
-use Modules\Comments\Models\BaseComment;
 
 class CommentForm extends ModelForm
 {
-    public function setModel(BaseComment $model)
+    public $model;
+
+    public $toLink;
+
+    public $exclude = ['is_spam', 'is_published', 'user'];
+
+    public function getFields()
     {
-        $this->_model = $model;
-        return $this;
+        return array_merge(parent::getFields(), [
+            'parent' => [
+                'class' => HiddenField::className()
+            ]
+        ]);
+    }
+
+    public function init()
+    {
+        $meta = $this->model->getMeta();
+        $this->exclude[] = $meta->getForeignField($this->toLink)->name;
+        if(!Mindy::app()->user->isGuest) {
+            $this->exclude = array_merge($this->exclude, ['username', 'email']);
+        }
+        parent::init();
     }
 
     public function getModel()
     {
-        return $this->_model;
+        return $this->model;
     }
 }

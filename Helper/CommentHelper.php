@@ -15,20 +15,30 @@
 namespace Modules\Comments\Helper;
 
 
+use Mindy\Http\Request;
 use Mindy\Orm\HasManyManager;
+use Mindy\Orm\Model;
 use Mindy\Pagination\Pagination;
 use Mindy\Utils\RenderTrait;
+use Modules\Comments\Forms\CommentForm;
 
 class CommentHelper
 {
     use RenderTrait;
 
-    public static function render_comments($template, HasManyManager $manager)
+    public static function render_comments(Request $request, $template, Model $model, HasManyManager $manager)
     {
+        $form = new CommentForm([
+            'model' => $manager->getModel(),
+            'toLink' => $manager->to
+        ]);
         $pager = new Pagination($manager->getQuerySet());
         return self::renderStatic($template, [
             'comments' => $pager->paginate(),
-            'pager' => $pager
+            'pager' => $pager,
+            'form' => $form,
+            'model' => $model,
+            'request' => $request
         ]);
     }
 }

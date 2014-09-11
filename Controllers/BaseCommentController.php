@@ -22,6 +22,8 @@ use Modules\Core\Controllers\CoreController;
 
 abstract class BaseCommentController extends CoreController
 {
+    public $toLink = 'owner_id';
+
     /**
      * @return \Modules\Comments\Models\BaseComment
      */
@@ -30,9 +32,9 @@ abstract class BaseCommentController extends CoreController
     /**
      * @return CommentForm
      */
-    public function getForm()
+    public function getForm($model, $toLink)
     {
-        return new CommentForm;
+        return new CommentForm(['model' => $model, 'toLink' => $toLink]);
     }
 
     public function getComments(Model $model)
@@ -43,33 +45,52 @@ abstract class BaseCommentController extends CoreController
         return [$models, $pager];
     }
 
+    public function getTemplate($name)
+    {
+        return 'comments/' . $name;
+    }
+
     public function internalActionList(Model $model)
     {
         list($models, $pager) = $this->getComments($model);
         if($this->r->isAjax) {
             echo $this->json($pager->toJson());
         } else {
-            echo $this->render('comments/list.html', [
-                'models' => $models
+            echo $this->render($this->getTemplate('list.html'), [
+                'models' => $models,
+                'form' => new CommentForm
             ]);
         }
     }
 
-    public function actionSave()
+    public function processForm(Model $model, BaseComment $instance)
     {
-        $form = $this->getForm();
-        $form->setModel($this->getModel());
-        if($this->r->isPost && $form->setAttributes($_POST)->isValid()) {
-            $model = $this->processComment($form->getInstance());
-            $isSaved = $model->save();
+        $form = $this->getForm($instance, $this->toLink);
+        $attributes = array_merge($_POST, [$this->toLink => $model->pk]);
+        if($this->r->isPost && $form->setAttributes($attributes)->isValid()) {
+            $instance = $this->processComment($form->getInstance());
+            return [$instance->save(), $instance];
+        }
+        return [false, null];
+    }
+
+    public function internalActionSave(Model $model)
+    {
+        if($this->r->isPost) {
+            list($isSaved, $instance) = $this->processForm($model, $this->getModel());
+            if($isSaved) {
+                $this->r->flash->success('Комментарий успешно добавлен');
+                $this->redirectNext();
+            }
+
             if($this->r->isAjax) {
                 echo $this->json([
                     'success' => $isSaved,
-                    'model' => $model->toJson()
+                    'model' => $instance->toJson()
                 ]);
             } else {
-                echo $this->render($isSaved ? 'comments/success.html' : 'comments/failed.html', [
-                    'model' => $model
+                echo $this->render($this->getTemplate($isSaved ? 'success.html' : 'failed.html'), [
+                    'model' => $instance
                 ]);
             }
         } else {

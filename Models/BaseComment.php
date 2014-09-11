@@ -48,7 +48,7 @@ abstract class BaseComment extends TreeModel
             ],
             'is_published' => [
                 'class' => BooleanField::className(),
-                'default' => true
+                'default' => true,
             ],
             'comment' => [
                 'class' => TextField::className(),
@@ -63,14 +63,15 @@ abstract class BaseComment extends TreeModel
                 'autoNow' => true
             ],
             'published_at' => [
-                'class' => DateTimeField::className()
+                'class' => DateTimeField::className(),
+                'editable' => false
             ],
         ]);
     }
 
     public function beforeSave($owner, $isNew)
     {
-        $akisment = $this->getModule()->akisment;
+        $akisment = Mindy::app()->getModule('Comments')->akisment;
         if (!empty($akisment) && count($akisment) == 2) {
             list($site, $key) = $akisment;
 
