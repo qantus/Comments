@@ -22,6 +22,7 @@ use Mindy\Orm\Fields\EmailField;
 use Mindy\Orm\Fields\ForeignField;
 use Mindy\Orm\Fields\TextField;
 use Mindy\Orm\TreeModel;
+use Modules\Comments\CommentsModule;
 use Modules\Comments\Helper\Akismet;
 use Modules\User\Models\User;
 
@@ -32,39 +33,48 @@ abstract class BaseComment extends TreeModel
         return array_merge(parent::getFields(), [
             'username' => [
                 'class' => CharField::className(),
-                'null' => true
+                'null' => true,
+                'verboseName' => CommentsModule::t('Username')
             ],
             'email' => [
                 'class' => EmailField::className(),
-                'null' => true
+                'null' => true,
+                'verboseName' => CommentsModule::t('Email')
             ],
             'user' => [
                 'class' => ForeignField::className(),
                 'modelClass' => User::className(),
-                'null' => true
+                'null' => true,
+                'verboseName' => CommentsModule::t('User')
             ],
             'is_spam' => [
                 'class' => BooleanField::className(),
+                'verboseName' => CommentsModule::t('Is spam')
             ],
             'is_published' => [
                 'class' => BooleanField::className(),
                 'default' => true,
+                'verboseName' => CommentsModule::t('Is published')
             ],
             'comment' => [
                 'class' => TextField::className(),
-                'null' => false
+                'null' => false,
+                'verboseName' => CommentsModule::t('Comment')
             ],
             'created_at' => [
                 'class' => DateTimeField::className(),
-                'autoNowAdd' => true
+                'autoNowAdd' => true,
+                'verboseName' => CommentsModule::t('Created at')
             ],
             'updated_at' => [
                 'class' => DateTimeField::className(),
-                'autoNow' => true
+                'autoNow' => true,
+                'verboseName' => CommentsModule::t('Updated at')
             ],
             'published_at' => [
                 'class' => DateTimeField::className(),
-                'editable' => false
+                'editable' => false,
+                'verboseName' => CommentsModule::t('Published at')
             ],
         ]);
     }
