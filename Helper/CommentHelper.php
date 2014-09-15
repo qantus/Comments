@@ -33,7 +33,7 @@ class CommentHelper
             'toLink' => $manager->to
         ]);
         $pager = new Pagination($manager->getQuerySet());
-        return self::renderStatic($template, [
+        return self::renderTemplate($template, [
             'comments' => $pager->paginate(),
             'pager' => $pager,
             'form' => $form,
