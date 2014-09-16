@@ -30,6 +30,8 @@ abstract class BaseCommentController extends CoreController
     abstract public function getModel();
 
     /**
+     * @param $model
+     * @param $toLink
      * @return CommentForm
      */
     public function getForm($model, $toLink)

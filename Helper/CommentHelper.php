@@ -20,7 +20,6 @@ use Mindy\Orm\HasManyManager;
 use Mindy\Orm\Model;
 use Mindy\Pagination\Pagination;
 use Mindy\Utils\RenderTrait;
-use Modules\Comments\Forms\CommentForm;
 
 class CommentHelper
 {
@@ -28,7 +27,13 @@ class CommentHelper
 
     public static function render_comments(Request $request, $template, Model $model, HasManyManager $manager)
     {
-        $form = new CommentForm([
+        $module = $manager->getModel()->getModule();
+        if(property_exists($module, 'commentForm')) {
+            $commentClass = $module->commentForm;
+        } else {
+            $commentClass = 'Modules\Comments\Forms\CommentForm';
+        }
+        $form = new $commentClass([
             'model' => $manager->getModel(),
             'toLink' => $manager->to
         ]);
