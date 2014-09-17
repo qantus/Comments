@@ -37,7 +37,7 @@ class CommentHelper
             'model' => $manager->getModel(),
             'toLink' => $manager->to
         ]);
-        $pager = new Pagination($manager->getQuerySet());
+        $pager = new Pagination($manager->getQuerySet()->filter(['is_published' => true]));
         return self::renderTemplate($template, [
             'comments' => $pager->paginate(),
             'pager' => $pager,

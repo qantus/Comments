@@ -74,6 +74,7 @@ abstract class BaseComment extends TreeModel
             'published_at' => [
                 'class' => DateTimeField::className(),
                 'editable' => false,
+                'null' => true,
                 'verboseName' => CommentsModule::t('Published at')
             ],
         ]);
@@ -82,6 +83,14 @@ abstract class BaseComment extends TreeModel
     public function beforeSave($owner, $isNew)
     {
         $akisment = Mindy::app()->getModule('Comments')->akisment;
+
+        if (!Mindy::app()->getUser()->getIsGuest()) {
+            $user = Mindy::app()->getUser();
+            $owner->user = $user;
+            $owner->email = $user->email;
+            $owner->username = $user->username;
+        }
+
         if (!empty($akisment) && count($akisment) == 2) {
             list($site, $key) = $akisment;
 
@@ -103,8 +112,10 @@ abstract class BaseComment extends TreeModel
                 $akismet->setCommentContent($owner->comment);
                 $akismet->setPermalink($owner->getRelationUrl());
                 $owner->is_spam = $akismet->isCommentSpam();
-                $owner->is_published = !$owner->is_spam;
+                $owner->is_published = !$owner->is_spam && !$this->getIsPremoderate();
             }
+        }else{
+            $owner->is_published = !$this->getIsPremoderate();
         }
 
         if($owner->is_published) {
@@ -119,6 +130,13 @@ abstract class BaseComment extends TreeModel
         return Mindy::app()->request->http->getAbsoluteUrl($url);
     }
 
+    public function getIsPremoderate()
+    {
+        if (Mindy::app()->getUser()->is_superuser) {
+            return false;
+        };
+        return Mindy::app()->getModule('Comments')->premoderate;
+    }
     /**
      * @return BaseComment
      */

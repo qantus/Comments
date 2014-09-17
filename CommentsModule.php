@@ -19,4 +19,5 @@ use Mindy\Base\Module;
 class CommentsModule extends Module
 {
     public $akisment = [];
+    public $premoderate = true;
 }
