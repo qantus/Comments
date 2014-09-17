@@ -17,6 +17,7 @@ namespace Modules\Comments\Forms;
 use Mindy\Base\Mindy;
 use Mindy\Form\Fields\HiddenField;
 use Mindy\Form\ModelForm;
+use Mindy\Form\Validator\RequiredValidator;
 
 class CommentForm extends ModelForm
 {
@@ -40,7 +41,9 @@ class CommentForm extends ModelForm
         parent::initFields();
         if (Mindy::app()->user->isGuest) {
             $this->_fields['username']->required = true;
+            $this->_fields['username']->validators[] = new RequiredValidator();
             $this->_fields['email']->required = true;
+            $this->_fields['email']->validators[] = new RequiredValidator();
         }
     }
 
