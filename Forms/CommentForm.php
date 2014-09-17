@@ -35,6 +35,15 @@ class CommentForm extends ModelForm
         ]);
     }
 
+    public function initFields()
+    {
+        parent::initFields();
+        if (Mindy::app()->user->isGuest) {
+            $this->_fields['username']->required = true;
+            $this->_fields['email']->required = true;
+        }
+    }
+
     public function init()
     {
         $meta = $this->model->getMeta();
