@@ -36,7 +36,13 @@ abstract class BaseCommentController extends CoreController
      */
     public function getForm($model, $toLink)
     {
-        return new CommentForm(['model' => $model, 'toLink' => $toLink]);
+        $module = $this->getModel()->getModule();
+        if(property_exists($module, 'commentForm') && $module->commentForm) {
+            $commentClass = $module->commentForm;
+        } else {
+            $commentClass = 'Modules\Comments\Forms\CommentForm';
+        }
+        return new $commentClass(['model' => $model, 'toLink' => $toLink]);
     }
 
     public function getComments(Model $model)
