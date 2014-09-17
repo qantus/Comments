@@ -21,4 +21,14 @@ abstract class BaseCommentAdmin extends ModelAdmin
     {
         return ['id', 'username', 'email', 'user', 'created_at', 'published_at', 'is_spam', 'is_published'];
     }
+
+    public function getVerboseName()
+    {
+        return $this->getModule()->t('comment');
+    }
+
+    public function getVerboseNamePlural()
+    {
+        return $this->getModule()->t('comments');
+    }
 }
