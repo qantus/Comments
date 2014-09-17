@@ -28,7 +28,7 @@ class CommentHelper
     public static function render_comments(Request $request, $template, Model $model, HasManyManager $manager)
     {
         $module = $manager->getModel()->getModule();
-        if(property_exists($module, 'commentForm')) {
+        if(property_exists($module, 'commentForm') && $module->commentForm) {
             $commentClass = $module->commentForm;
         } else {
             $commentClass = 'Modules\Comments\Forms\CommentForm';
