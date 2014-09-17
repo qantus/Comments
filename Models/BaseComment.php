@@ -59,6 +59,7 @@ abstract class BaseComment extends TreeModel
             'comment' => [
                 'class' => TextField::className(),
                 'null' => false,
+                'required' => true,
                 'verboseName' => CommentsModule::t('Comment')
             ],
             'created_at' => [
