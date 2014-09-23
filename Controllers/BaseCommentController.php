@@ -14,10 +14,13 @@
 
 namespace Modules\Comments\Controllers;
 
+use Mindy\Base\Mindy;
+use Mindy\Helper\Json;
 use Mindy\Orm\Model;
 use Mindy\Pagination\Pagination;
 use Modules\Comments\Forms\CommentForm;
 use Modules\Comments\Models\BaseComment;
+use Modules\Core\Components\ParamsHelper;
 use Modules\Core\Controllers\CoreController;
 
 abstract class BaseCommentController extends CoreController
@@ -84,10 +87,12 @@ abstract class BaseCommentController extends CoreController
 
     public function internalActionSave(Model $model)
     {
+        $this->ajaxValidation($model);
         if($this->r->isPost) {
             list($isSaved, $instance) = $this->processForm($model, $this->getModel());
             if($isSaved) {
                 $this->r->flash->success('Комментарий успешно добавлен');
+                $this->notify($instance);
                 $this->redirectNext();
             }
 
@@ -106,6 +111,31 @@ abstract class BaseCommentController extends CoreController
         }
     }
 
+    public function notify($instance)
+    {
+        if (property_exists($instance, 'notify') && $instance->notify) {
+            $data = [
+                'username' => $instance->username,
+                'email' => $instance->email,
+                'comment' => $instance->comment
+            ];
+            Mindy::app()->mail->fromCode('comments.new_comment', ParamsHelper::get('core.core.email_owner'), [
+                'data' => $data
+            ]);
+        }
+    }
+
+    public function ajaxValidation($model)
+    {
+        if($this->r->isPost && isset($_POST['ajax_validation'])) {
+            $instance = $this->getModel();
+            $form = $this->getForm($instance, $this->toLink);
+            $attributes = array_merge($_POST, [$this->toLink => $model->pk]);
+            $form->setAttributes($attributes)->isValid();
+            echo Json::encode($form->getErrors());
+            Mindy::app()->end();
+        }
+    }
     /**
      * @param \Mindy\Orm\Model $model
      * @param \Mindy\Orm\Manager|\Mindy\Orm\QuerySet $qs

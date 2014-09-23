@@ -28,6 +28,8 @@ use Modules\User\Models\User;
 
 abstract class BaseComment extends TreeModel
 {
+    public $notify = true;
+
     public static function getFields()
     {
         return array_merge(parent::getFields(), [
