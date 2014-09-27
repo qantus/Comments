@@ -25,7 +25,7 @@ class CommentForm extends ModelForm
 
     public $toLink;
 
-    public $exclude = ['is_spam', 'is_published', 'user'];
+    public $exclude = ['is_spam', 'is_published', 'user', 'created_at', 'updated_at'];
 
     public function getFields()
     {
@@ -49,7 +49,10 @@ class CommentForm extends ModelForm
 
     public function init()
     {
-        $meta = $this->model->getMeta();
+        if(!$this->getModel()) {
+            d(debug_backtrace());
+        }
+        $meta = $this->getModel()->getMeta();
         $this->exclude[] = $meta->getForeignField($this->toLink)->name;
         if(!Mindy::app()->user->isGuest) {
             $this->exclude = array_merge($this->exclude, ['username', 'email']);
@@ -60,5 +63,18 @@ class CommentForm extends ModelForm
     public function getModel()
     {
         return $this->model;
+    }
+
+    public function save()
+    {
+        if($this->getInstance()->getIsNewRecord()) {
+            $saved = parent::save();
+            Mindy::app()->mail->fromCode('comments.new_comment', Mindy::app()->managers, [
+                'data' => $this->getInstance()
+            ]);
+            return $saved;
+        } else {
+            return parent::save();
+        }
     }
 }

@@ -31,13 +31,14 @@ class CommentHelper
         if(property_exists($module, 'commentForm') && $module->commentForm) {
             $commentClass = $module->commentForm;
         } else {
-            $commentClass = 'Modules\Comments\Forms\CommentForm';
+            $commentClass = '\Modules\Comments\Forms\CommentForm';
         }
         $form = new $commentClass([
             'model' => $manager->getModel(),
             'toLink' => $manager->to
         ]);
-        $pager = new Pagination($manager->getQuerySet()->filter(['is_published' => true]));
+        $qs = $manager->getQuerySet()->filter(['is_published' => true])->order(['root', 'lft']);
+        $pager = new Pagination($qs);
         return self::renderTemplate($template, [
             'comments' => $pager->paginate(),
             'pager' => $pager,

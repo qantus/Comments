@@ -28,8 +28,6 @@ use Modules\User\Models\User;
 
 abstract class BaseComment extends TreeModel
 {
-    public $notify = true;
-
     public static function getFields()
     {
         return array_merge(parent::getFields(), [
@@ -117,11 +115,11 @@ abstract class BaseComment extends TreeModel
                 $owner->is_spam = $akismet->isCommentSpam();
                 $owner->is_published = !$owner->is_spam && !$this->getIsPremoderate();
             }
-        }else{
+        } else {
             $owner->is_published = !$this->getIsPremoderate();
         }
 
-        if($owner->is_published) {
+        if ($owner->is_published) {
             $owner->published_at = time();
         } else {
             $owner->published_at = null;
@@ -140,6 +138,7 @@ abstract class BaseComment extends TreeModel
         };
         return Mindy::app()->getModule('Comments')->premoderate;
     }
+
     /**
      * @return BaseComment
      */
@@ -148,7 +147,7 @@ abstract class BaseComment extends TreeModel
     public function getRelationUrl()
     {
         $relation = $this->getRelation();
-        if(method_exists($relation, 'getAbsoluteUrl')) {
+        if (method_exists($relation, 'getAbsoluteUrl')) {
             return $this->wrapUrl($relation->getAbsoluteUrl());
         }
 

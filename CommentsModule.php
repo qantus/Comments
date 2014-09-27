@@ -14,10 +14,24 @@
 
 namespace Modules\Comments;
 
+use Mindy\Base\Mindy;
 use Mindy\Base\Module;
 
 class CommentsModule extends Module
 {
+    /**
+     * @var array akisment config
+     */
     public $akisment = [];
+
+    /**
+     * @var bool
+     */
     public $premoderate = true;
+
+    public static function preConfigure()
+    {
+        $tpl = Mindy::app()->template;
+        $tpl->addHelper('render_comments', ['\Modules\Comments\Helper\CommentHelper', 'render_comments']);
+    }
 }

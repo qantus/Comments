@@ -20,12 +20,13 @@ use Mindy\Orm\Model;
 use Mindy\Pagination\Pagination;
 use Modules\Comments\Forms\CommentForm;
 use Modules\Comments\Models\BaseComment;
-use Modules\Core\Components\ParamsHelper;
 use Modules\Core\Controllers\CoreController;
 
 abstract class BaseCommentController extends CoreController
 {
     public $toLink = 'owner_id';
+
+    public $template = 'list.html';
 
     /**
      * @return \Modules\Comments\Models\BaseComment
@@ -50,15 +51,15 @@ abstract class BaseCommentController extends CoreController
 
     public function getComments(Model $model)
     {
-        $qs = $this->getModel()->objects()->notspam()->published();
+        $qs = $this->getModel()->objects()->nospam()->published();
         $pager = new Pagination($this->processComments($model, $qs));
         $models = $pager->paginate();
         return [$models, $pager];
     }
 
-    public function getTemplate($name)
+    public function getTemplate()
     {
-        return 'comments/' . $name;
+        return 'comments/' . $this->template;
     }
 
     public function internalActionList(Model $model)
@@ -67,9 +68,12 @@ abstract class BaseCommentController extends CoreController
         if($this->r->isAjax) {
             echo $this->json($pager->toJson());
         } else {
-            echo $this->render($this->getTemplate('list.html'), [
-                'models' => $models,
-                'form' => new CommentForm
+            echo $this->render($this->getTemplate(), [
+                'comments' => $models,
+                'form' => new CommentForm([
+                        'model' => $this->getModel(),
+                        'toLink' => $this->toLink
+                    ])
             ]);
         }
     }
@@ -92,7 +96,6 @@ abstract class BaseCommentController extends CoreController
             list($isSaved, $instance) = $this->processForm($model, $this->getModel());
             if($isSaved) {
                 $this->r->flash->success('Комментарий успешно добавлен');
-                $this->notify($instance);
                 $this->redirectNext();
             }
 
@@ -108,20 +111,6 @@ abstract class BaseCommentController extends CoreController
             }
         } else {
             $this->error(400);
-        }
-    }
-
-    public function notify($instance)
-    {
-        if (property_exists($instance, 'notify') && $instance->notify) {
-            $data = [
-                'username' => $instance->username,
-                'email' => $instance->email,
-                'comment' => $instance->comment
-            ];
-            Mindy::app()->mail->fromCode('comments.new_comment', ParamsHelper::get('core.core.email_owner'), [
-                'data' => $data
-            ]);
         }
     }
 
