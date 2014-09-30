@@ -27,7 +27,7 @@ class CommentsModule extends Module
     /**
      * @var bool
      */
-    public $premoderate = true;
+    public $premoderate = false;
 
     public static function preConfigure()
     {
