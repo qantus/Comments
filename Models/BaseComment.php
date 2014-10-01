@@ -83,40 +83,42 @@ abstract class BaseComment extends TreeModel
 
     public function beforeSave($owner, $isNew)
     {
-        $akisment = Mindy::app()->getModule('Comments')->akisment;
+        if ($owner->getIsNewRecord()){
+            $akisment = Mindy::app()->getModule('Comments')->akisment;
 
-        if (!Mindy::app()->getUser()->getIsGuest()) {
-            $user = Mindy::app()->getUser();
-            $owner->user = $user;
-            $owner->email = $user->email;
-            $owner->username = $user->username;
-        }
-
-        if (!empty($akisment) && count($akisment) == 2) {
-            list($site, $key) = $akisment;
-
-            $akismet = new Akismet($site, $key);
-            if (!$akismet->isKeyValid()) {
-                Mindy::app()->logger->error('Invalid akisment key', 'comments');
-            } else {
-                if ($user = $owner->user) {
-                    $akismet->setCommentAuthor($user->username);
-                    $akismet->setCommentAuthorEmail($user->email);
-                    if (method_exists($user, 'getAbsoluteUrl')) {
-                        $akismet->setCommentAuthorURL($this->wrapUrl($user->getAbsoluteUrl()));
-                    }
-                } else {
-                    $akismet->setCommentAuthor($owner->username);
-                    $akismet->setCommentAuthorEmail($owner->email);
-                    $akismet->setCommentAuthorURL(null);
-                }
-                $akismet->setCommentContent($owner->comment);
-                $akismet->setPermalink($owner->getRelationUrl());
-                $owner->is_spam = $akismet->isCommentSpam();
-                $owner->is_published = !$owner->is_spam && !$this->getIsPremoderate();
+            if (!Mindy::app()->getUser()->getIsGuest()) {
+                $user = Mindy::app()->getUser();
+                $owner->user = $user;
+                $owner->email = $user->email;
+                $owner->username = $user->username;
             }
-        } else {
-            $owner->is_published = !$this->getIsPremoderate();
+
+            if (!empty($akisment) && count($akisment) == 2) {
+                list($site, $key) = $akisment;
+
+                $akismet = new Akismet($site, $key);
+                if (!$akismet->isKeyValid()) {
+                    Mindy::app()->logger->error('Invalid akisment key', 'comments');
+                } else {
+                    if ($user = $owner->user) {
+                        $akismet->setCommentAuthor($user->username);
+                        $akismet->setCommentAuthorEmail($user->email);
+                        if (method_exists($user, 'getAbsoluteUrl')) {
+                            $akismet->setCommentAuthorURL($this->wrapUrl($user->getAbsoluteUrl()));
+                        }
+                    } else {
+                        $akismet->setCommentAuthor($owner->username);
+                        $akismet->setCommentAuthorEmail($owner->email);
+                        $akismet->setCommentAuthorURL(null);
+                    }
+                    $akismet->setCommentContent($owner->comment);
+                    $akismet->setPermalink($owner->getRelationUrl());
+                    $owner->is_spam = $akismet->isCommentSpam();
+                    $owner->is_published = !$owner->is_spam && !$this->getIsPremoderate();
+                }
+            } else {
+                $owner->is_published = !$this->getIsPremoderate();
+            }
         }
 
         if ($owner->is_published) {
