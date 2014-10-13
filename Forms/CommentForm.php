@@ -49,12 +49,9 @@ class CommentForm extends ModelForm
 
     public function init()
     {
-        if(!$this->getModel()) {
-            d(debug_backtrace());
-        }
         $meta = $this->getModel()->getMeta();
         $this->exclude[] = $meta->getForeignField($this->toLink)->name;
-        if(!Mindy::app()->user->isGuest) {
+        if (!Mindy::app()->user->isGuest) {
             $this->exclude = array_merge($this->exclude, ['username', 'email']);
         }
         parent::init();
@@ -67,7 +64,7 @@ class CommentForm extends ModelForm
 
     public function save()
     {
-        if($this->getInstance()->getIsNewRecord()) {
+        if ($this->getInstance()->getIsNewRecord()) {
             $saved = parent::save();
             Mindy::app()->mail->fromCode('comments.new_comment', Mindy::app()->managers, [
                 'data' => $this->getInstance()
