@@ -17,7 +17,7 @@ namespace Modules\Comments\Forms;
 use Mindy\Base\Mindy;
 use Mindy\Form\Fields\HiddenField;
 use Mindy\Form\ModelForm;
-use Mindy\Form\Validator\RequiredValidator;
+use Mindy\Validation\RequiredValidator;
 
 class CommentForm extends ModelForm
 {

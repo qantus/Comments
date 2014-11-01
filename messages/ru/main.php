@@ -1,13 +1,14 @@
 <?php
 
-return array (
-  'Username' => 'Имя',
-  'Email' => 'Электронная почта',
-  'User' => 'Пользователь',
-  'Is spam' => 'Спам',
-  'Is published' => 'Опубликовано',
-  'Comment' => 'Комментарий',
-  'Created at' => 'Время создания',
-  'Updated at' => 'Время обновления',
-  'Published at' => 'Время публикации',
+return array(
+    'Username' => 'Имя',
+    'Email' => 'Электронная почта',
+    'User' => 'Пользователь',
+    'Is spam' => 'Спам',
+    'Is published' => 'Опубликовано',
+    'Comment' => 'Комментарий',
+    'Created at' => 'Время создания',
+    'Updated at' => 'Время обновления',
+    'Published at' => 'Время публикации',
+    'Comments' => 'Комментарии'
 );

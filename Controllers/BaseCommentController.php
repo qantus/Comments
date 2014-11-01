@@ -57,9 +57,9 @@ abstract class BaseCommentController extends CoreController
         return [$models, $pager];
     }
 
-    public function getTemplate()
+    public function getTemplate($name = null)
     {
-        return 'comments/' . $this->template;
+        return 'comments/' . ($name === null) ? $name : $this->template;
     }
 
     public function internalActionList(Model $model)
@@ -81,8 +81,8 @@ abstract class BaseCommentController extends CoreController
     public function processForm(Model $model, BaseComment $instance)
     {
         $form = $this->getForm($instance, $this->toLink);
-        $attributes = array_merge($_POST, [$this->toLink => $model->pk]);
-        if($this->r->isPost && $form->setAttributes($attributes)->isValid()) {
+        $post = array_merge_recursive($_POST, [$form->classNameShort() => [$this->toLink => $model->pk]]);
+        if($this->r->isPost && $form->populate($post)->isValid()) {
             $instance = $this->processComment($form->getInstance());
             return [$instance->save(), $instance];
         }
