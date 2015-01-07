@@ -23,11 +23,18 @@ class CommentsModule extends Module
      * @var array akisment config
      */
     public $akisment = [];
-
     /**
      * @var bool
      */
-    public $premoderate = false;
+    public $premoderate = true;
+    /**
+     * @var string
+     */
+    public $recaptchaPublicKey;
+    /**
+     * @var string
+     */
+    public $recaptchaSecretKey;
 
     public static function preConfigure()
     {

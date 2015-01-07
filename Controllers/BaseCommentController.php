@@ -1,9 +1,9 @@
 <?php
 /**
- * 
+ *
  *
  * All rights reserved.
- * 
+ *
  * @author Falaleev Maxim
  * @email max@studio107.ru
  * @version 1.0
@@ -41,7 +41,7 @@ abstract class BaseCommentController extends CoreController
     public function getForm($model, $toLink)
     {
         $module = $this->getModel()->getModule();
-        if(property_exists($module, 'commentForm') && $module->commentForm) {
+        if (property_exists($module, 'commentForm') && $module->commentForm) {
             $commentClass = $module->commentForm;
         } else {
             $commentClass = 'Modules\Comments\Forms\CommentForm';
@@ -65,15 +65,15 @@ abstract class BaseCommentController extends CoreController
     public function internalActionList(Model $model)
     {
         list($models, $pager) = $this->getComments($model);
-        if($this->r->isAjax) {
+        if ($this->r->isAjax) {
             echo $this->json($pager->toJson());
         } else {
             echo $this->render($this->getTemplate(), [
                 'comments' => $models,
                 'form' => new CommentForm([
-                        'model' => $this->getModel(),
-                        'toLink' => $this->toLink
-                    ])
+                    'model' => $this->getModel(),
+                    'toLink' => $this->toLink
+                ])
             ]);
         }
     }
@@ -82,7 +82,7 @@ abstract class BaseCommentController extends CoreController
     {
         $form = $this->getForm($instance, $this->toLink);
         $post = array_merge_recursive($_POST, [$form->classNameShort() => [$this->toLink => $model->pk]]);
-        if($this->r->isPost && $form->populate($post)->isValid()) {
+        if ($this->r->isPost && $form->populate($post)->isValid()) {
             $instance = $this->processComment($form->getInstance());
             return [$instance->save(), $instance];
         }
@@ -92,14 +92,14 @@ abstract class BaseCommentController extends CoreController
     public function internalActionSave(Model $model)
     {
         $this->ajaxValidation($model);
-        if($this->r->isPost) {
+        if ($this->r->isPost) {
             list($isSaved, $instance) = $this->processForm($model, $this->getModel());
-            if($isSaved) {
+            if ($isSaved) {
                 $this->r->flash->success('Комментарий успешно добавлен');
                 $this->redirectNext();
             }
 
-            if($this->r->isAjax) {
+            if ($this->r->isAjax) {
                 echo $this->json([
                     'success' => $isSaved,
                     'model' => $instance->toJson()
@@ -116,7 +116,7 @@ abstract class BaseCommentController extends CoreController
 
     public function ajaxValidation($model)
     {
-        if($this->r->isPost && isset($_POST['ajax_validation'])) {
+        if ($this->r->isPost && isset($_POST['ajax_validation'])) {
             $instance = $this->getModel();
             $form = $this->getForm($instance, $this->toLink);
             $attributes = array_merge($_POST, [$this->toLink => $model->pk]);
@@ -125,6 +125,7 @@ abstract class BaseCommentController extends CoreController
             Mindy::app()->end();
         }
     }
+
     /**
      * @param \Mindy\Orm\Model $model
      * @param \Mindy\Orm\Manager|\Mindy\Orm\QuerySet $qs

@@ -26,6 +26,7 @@ class CommentManager extends TreeManager
 
     public function published()
     {
+        d(1);
         $this->filter(['is_published' => true]);
         return $this;
     }

@@ -23,7 +23,7 @@ use Mindy\Orm\Fields\ForeignField;
 use Mindy\Orm\Fields\TextField;
 use Mindy\Orm\TreeModel;
 use Modules\Comments\CommentsModule;
-use Modules\Comments\Helper\Akismet;
+use Modules\Comments\Components\Akismet\Akismet;
 use Modules\User\Models\User;
 
 abstract class BaseComment extends TreeModel
@@ -130,7 +130,7 @@ abstract class BaseComment extends TreeModel
 
     protected function wrapUrl($url)
     {
-        return Mindy::app()->request->http->getAbsoluteUrl($url);
+        return Mindy::app()->request->http->absoluteUrl($url);
     }
 
     public function getIsPremoderate()

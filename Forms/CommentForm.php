@@ -16,7 +16,9 @@ namespace Modules\Comments\Forms;
 
 use Mindy\Base\Mindy;
 use Mindy\Form\Fields\HiddenField;
+use Mindy\Form\Fields\RecaptchaField;
 use Mindy\Form\ModelForm;
+use Mindy\Locale\Translate;
 use Mindy\Validation\RequiredValidator;
 
 class CommentForm extends ModelForm
@@ -29,9 +31,16 @@ class CommentForm extends ModelForm
 
     public function getFields()
     {
+        $module = Mindy::app()->getModule('Comments');
         return array_merge(parent::getFields(), [
             'parent' => [
                 'class' => HiddenField::className()
+            ],
+            'captcha' => [
+                'class' => RecaptchaField::className(),
+                'label' => Translate::getInstance()->t('validation', 'Captcha'),
+                'publicKey' => $module->recaptchaPublicKey,
+                'secretKey' => $module->recaptchaSecretKey
             ]
         ]);
     }
@@ -51,8 +60,12 @@ class CommentForm extends ModelForm
     {
         $meta = $this->getModel()->getMeta();
         $this->exclude[] = $meta->getForeignField($this->toLink)->name;
-        if (!Mindy::app()->user->isGuest) {
-            $this->exclude = array_merge($this->exclude, ['username', 'email']);
+        if (Mindy::app()->user->isGuest === false) {
+            $this->exclude = array_merge($this->exclude, ['username', 'email', 'captcha']);
+        }
+        $module = Mindy::app()->getModule('Comments');
+        if (empty($module->recaptchaPublicKey) && empty($module->recaptchaPublicKey)) {
+            $this->exclude = array_merge($this->exclude, ['captcha']);
         }
         parent::init();
     }
