@@ -11,4 +11,6 @@ return array (
   'Updated at' => 'Время обновления',
   'Published at' => 'Время публикации',
   'Comments' => 'Комментарии',
+  'The comment is successfully added' => 'Комментарий успешно добавлен',
+  'Your comment will appear on the website after being moderated' => 'Ваш комментарий появится на сайте после проверки модератором'
 );
