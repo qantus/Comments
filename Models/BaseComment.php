@@ -15,6 +15,7 @@
 namespace Modules\Comments\Models;
 
 use Mindy\Base\Mindy;
+use Mindy\Helper\Text;
 use Mindy\Orm\Fields\BooleanField;
 use Mindy\Orm\Fields\CharField;
 use Mindy\Orm\Fields\DateTimeField;
@@ -164,5 +165,10 @@ abstract class BaseComment extends TreeModel
     {
         $className = get_called_class();
         return new CommentManager($instance ? $instance : new $className);
+    }
+
+    public function getName()
+    {
+        return $this->username . ":" . Text::limit($this->comment, 40);
     }
 }

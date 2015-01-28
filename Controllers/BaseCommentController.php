@@ -18,6 +18,7 @@ use Mindy\Base\Mindy;
 use Mindy\Helper\Json;
 use Mindy\Orm\Model;
 use Mindy\Pagination\Pagination;
+use Modules\Comments\CommentsModule;
 use Modules\Comments\Forms\CommentForm;
 use Modules\Comments\Models\BaseComment;
 use Modules\Core\Controllers\CoreController;
@@ -95,7 +96,11 @@ abstract class BaseCommentController extends CoreController
         if ($this->r->isPost) {
             list($isSaved, $instance) = $this->processForm($model, $this->getModel());
             if ($isSaved) {
-                $this->r->flash->success('Комментарий успешно добавлен');
+                if ($instance->is_published) {
+                    $this->r->flash->success(CommentsModule::t('The comment is successfully added'));
+                } else {
+                    $this->r->flash->success(CommentsModule::t('Your comment will appear on the website after being moderated'));
+                }
                 $this->redirectNext();
             }
 
@@ -120,7 +125,7 @@ abstract class BaseCommentController extends CoreController
             $instance = $this->getModel();
             $form = $this->getForm($instance, $this->toLink);
             $attributes = array_merge($_POST, [$this->toLink => $model->pk]);
-            $form->setAttributes($attributes)->isValid();
+            $form->populate($attributes)->isValid();
             echo Json::encode($form->getErrors());
             Mindy::app()->end();
         }
