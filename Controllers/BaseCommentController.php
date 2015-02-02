@@ -84,8 +84,8 @@ abstract class BaseCommentController extends CoreController
         $form = $this->getForm($instance, $this->toLink);
         $post = array_merge_recursive($_POST, [$form->classNameShort() => [$this->toLink => $model->pk]]);
         if ($this->r->isPost && $form->populate($post)->isValid()) {
-            $instance = $this->processComment($form->getInstance());
-            return [$instance->save(), $instance];
+            $form->instance = $this->processComment($form->getInstance());
+            return [$form->save(), $form->getInstance()];
         }
         return [false, null];
     }
